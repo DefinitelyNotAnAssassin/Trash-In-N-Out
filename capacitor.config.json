@@ -1,0 +1,31 @@
+{
+    "appId": "io.ionic.recyclemate",
+    "appName": "RecycleMate",
+    "webDir": "dist",
+    "bundledWebRuntime": false,
+    "plugins": {
+      "SplashScreen": {
+        "launchShowDuration": 3000
+      },
+      "Geolocation": {
+        "permissions": ["location"]
+      },
+      "GoogleMaps": {
+        "apiKey": "AIzaSyDmSzv-D1glzeKveS_OF0ZlXaWLuvLyhuk"
+      }
+    },
+    "server": {
+      "androidScheme": "https",
+      "cleartext": true
+    },
+    "android": {
+      "backgroundColor": "#00000000",
+      "allowMixedContent": true,
+      "captureInput": true,
+      "webContentsDebuggingEnabled": true
+    },
+    "ios": {
+      "backgroundColor": "#00000000"
+    }
+  }
+  

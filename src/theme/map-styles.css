@@ -1,0 +1,102 @@
+/* Map styles for Android compatibility */
+.map-content {
+    --background: transparent !important;
+  }
+  
+  .map-container {
+    position: relative;
+    z-index: 10;
+    background-color: transparent;
+  }
+  
+  .map-element {
+    background-color: transparent;
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Make sure the page background is transparent */
+  ion-content.map-content::part(background) {
+    background: transparent;
+  }
+  
+  /* Ensure the scroll container is transparent */
+  ion-content.map-content::part(scroll) {
+    background: transparent;
+  }
+  
+  /* For Android, ensure the map is visible */
+  @supports (-webkit-touch-callout: none) {
+    .capacitor-google-map {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+  }
+  
+  /* Specific styles for maps in modals */
+  ion-modal .map-content {
+    --background: transparent !important;
+  }
+  
+  ion-modal .map-container {
+    position: relative;
+    z-index: 10;
+    background-color: transparent;
+  }
+  
+  ion-modal .map-element {
+    background-color: transparent;
+    position: relative;
+    z-index: 10;
+  }
+  
+  /* Ensure modal content is transparent */
+  ion-modal ion-content::part(background) {
+    background: transparent;
+  }
+  
+  ion-modal ion-content::part(scroll) {
+    background: transparent;
+  }
+  
+  /* Fix for Android modal maps */
+  @supports (-webkit-touch-callout: none) {
+    ion-modal .capacitor-google-map {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+    }
+  }
+  
+  /* Styles for the LocationMap component */
+  .location-map-container {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .location-map-wrapper {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+  }
+  
+  /* Fix for Android */
+  @supports (-webkit-touch-callout: none) {
+    .location-map-wrapper .capacitor-google-map {
+      display: block !important;
+      position: relative !important;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 10 !important;
+    }
+  }
+  
