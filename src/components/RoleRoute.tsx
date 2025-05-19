@@ -6,7 +6,7 @@ import { useAuth, getUserDataFromStorage } from "../contexts/AuthContext"
 
 interface RoleRouteProps extends RouteProps {
   children: React.ReactNode
-  role: "resident" | "junkshop" | string
+  role: string[] | string
 }
 
 const RoleRoute: React.FC<RoleRouteProps> = ({ children, role, ...rest }) => {
@@ -17,18 +17,29 @@ const RoleRoute: React.FC<RoleRouteProps> = ({ children, role, ...rest }) => {
   return (
     <Route
       {...rest}
-      render={({ location }) =>
-        userInfo && userInfo.role === role ? (
-          children
-        ) : (
-          <Redirect
-            to={{
-              pathname: "/app/home",
-              state: { from: location },
-            }}
-          />
-        )
-      }
+      render={({ location }) => {
+        // Debug log to see what roles are being checked
+        console.log("RoleRoute check - Required role:", role)
+        console.log("RoleRoute check - User role:", userInfo?.role)
+
+        // Convert single role to array for consistent handling
+        const requiredRoles = Array.isArray(role) ? role : [role]
+
+        // Check if user's role is in the allowed roles array
+        if (userInfo && requiredRoles.includes(userInfo.role)) {
+          return children
+        } else {
+          console.log("Role mismatch - redirecting")
+          return (
+            <Redirect
+              to={{
+                pathname: "/app/home",
+                state: { from: location },
+              }}
+            />
+          )
+        }
+      }}
     />
   )
 }

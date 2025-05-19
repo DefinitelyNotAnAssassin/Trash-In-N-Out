@@ -104,7 +104,7 @@ const Map: React.FC = () => {
           const newMap = await GoogleMap.create({
             id: mapId,
             element: mapElement,
-            apiKey: "AIzaSyDmSzv-D1glzeKveS_OF0ZlXaWLuvLyhuk",
+            apiKey: "AIzaSyCjkzdlzmt71ouI5nGXPQluqY1E_2vkqME",
             config: {
               center: currentLocation,
               zoom: 14,

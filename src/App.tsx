@@ -15,7 +15,17 @@ import {
   IonBadge,
 } from "@ionic/react"
 import { IonReactRouter } from "@ionic/react-router"
-import { home, map, notifications, person, businessOutline, listOutline } from "ionicons/icons"
+import {
+  home,
+  map,
+  notifications,
+  person,
+  businessOutline,
+  listOutline,
+  calculatorOutline,
+  chatbubblesOutline,
+  statsChartOutline,
+} from "ionicons/icons"
 
 /* Core CSS required for Ionic components */
 import "@ionic/react/css/core.css"
@@ -44,6 +54,9 @@ import Register from "./pages/Register"
 import JunkshopDashboard from "./pages/JunkshopDashboard"
 import MaterialRequest from "./pages/MaterialRequest"
 import UserMaterialRequests from "./pages/UserMaterialRequests"
+import RecycleCalculator from "./pages/RecycleCalculator"
+import Chat from "./pages/Chat"
+import AdminDashboard from "./pages/AdminDashboard"
 import { AuthProvider, useAuth, getUserDataFromStorage } from "./contexts/AuthContext"
 import PrivateRoute from "./components/PrivateRoute"
 import RoleRoute from "./components/RoleRoute"
@@ -62,6 +75,8 @@ const AppTabs: React.FC = () => {
   const storedUserData = getUserDataFromStorage()
   const userInfo = userData || storedUserData
   const isResident = userInfo?.role === "resident"
+  const isJunkshop = userInfo?.role === "junkshop"
+  const isAdmin = userInfo?.role === "admin"
 
   const [networkStatus, setNetworkStatus] = useState({
     isOnline: navigator.onLine,
@@ -69,6 +84,7 @@ const AppTabs: React.FC = () => {
   })
 
   const [unreadNotifications, setUnreadNotifications] = useState(0)
+  const [unreadMessages, setUnreadMessages] = useState(0)
 
   // Monitor network status
   useEffect(() => {
@@ -114,6 +130,26 @@ const AppTabs: React.FC = () => {
     return () => unsubscribe()
   }, [userInfo?.uid])
 
+  // Monitor unread messages
+  useEffect(() => {
+    if (!userInfo?.uid) return
+
+    const messagesRef = collection(firestore, "messages")
+    const q = query(messagesRef, where("recipientId", "==", userInfo.uid), where("read", "==", false))
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setUnreadMessages(snapshot.size)
+      },
+      (error) => {
+        console.error("Error fetching unread messages count", error)
+      },
+    )
+
+    return () => unsubscribe()
+  }, [userInfo?.uid])
+
   return (
     <>
       <IonTabs>
@@ -132,6 +168,10 @@ const AppTabs: React.FC = () => {
           <RoleRoute path="/app/my-requests" role="resident">
             <UserMaterialRequests />
           </RoleRoute>
+          {/* Calculator shared between resident and junkshop */}
+          <RoleRoute path="/app/calculator" role={["resident", "junkshop"]}>
+            <RecycleCalculator />
+          </RoleRoute>
 
           {/* Junkshop-only routes */}
           <RoleRoute path="/app/junkshop-dashboard" role="junkshop">
@@ -139,6 +179,11 @@ const AppTabs: React.FC = () => {
           </RoleRoute>
           <RoleRoute path="/app/find-materials" role="junkshop">
             <Map />
+          </RoleRoute>
+
+          {/* Admin-only routes */}
+          <RoleRoute path="/app/admin-dashboard" role="admin">
+            <AdminDashboard />
           </RoleRoute>
 
           {/* Common routes */}
@@ -151,13 +196,41 @@ const AppTabs: React.FC = () => {
           <Route path="/app/profile">
             <Profile />
           </Route>
+          <Route path="/app/chat">
+            <Chat />
+          </Route>
           <Route exact path="/app">
             <Redirect to="/app/home" />
           </Route>
         </IonRouterOutlet>
 
         {/* Role-specific tab bars */}
-        {isResident ? (
+        {isAdmin ? (
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="home" href="/app/home">
+              <IonIcon icon={home} />
+              <IonLabel>Home</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="admin-dashboard" href="/app/admin-dashboard">
+              <IonIcon icon={statsChartOutline} />
+              <IonLabel>Dashboard</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="chat" href="/app/chat">
+              <IonIcon icon={chatbubblesOutline} />
+              <IonLabel>Chat</IonLabel>
+              {unreadMessages > 0 && <IonBadge color="danger">{unreadMessages}</IonBadge>}
+            </IonTabButton>
+            <IonTabButton tab="notifications" href="/app/notifications">
+              <IonIcon icon={notifications} />
+              <IonLabel>Alerts</IonLabel>
+              {unreadNotifications > 0 && <IonBadge color="danger">{unreadNotifications}</IonBadge>}
+            </IonTabButton>
+            <IonTabButton tab="profile" href="/app/profile">
+              <IonIcon icon={person} />
+              <IonLabel>Profile</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        ) : isResident ? (
           <IonTabBar slot="bottom">
             <IonTabButton tab="home" href="/app/home">
               <IonIcon icon={home} />
@@ -171,14 +244,11 @@ const AppTabs: React.FC = () => {
               <IonIcon icon={listOutline} />
               <IonLabel>My Requests</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="notifications" href="/app/notifications">
-              <IonIcon icon={notifications} />
-              <IonLabel>Alerts</IonLabel>
-              {unreadNotifications > 0 && <IonBadge color="danger">{unreadNotifications}</IonBadge>}
-            </IonTabButton>
-            <IonTabButton tab="profile" href="/app/profile">
-              <IonIcon icon={person} />
-              <IonLabel>Profile</IonLabel>
+       
+            <IonTabButton tab="chat" href="/app/chat">
+              <IonIcon icon={chatbubblesOutline} />
+              <IonLabel>Chat</IonLabel>
+              {unreadMessages > 0 && <IonBadge color="danger">{unreadMessages}</IonBadge>}
             </IonTabButton>
           </IonTabBar>
         ) : (
@@ -195,14 +265,14 @@ const AppTabs: React.FC = () => {
               <IonIcon icon={map} />
               <IonLabel>Find</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="notifications" href="/app/notifications">
-              <IonIcon icon={notifications} />
-              <IonLabel>Alerts</IonLabel>
-              {unreadNotifications > 0 && <IonBadge color="danger">{unreadNotifications}</IonBadge>}
+            <IonTabButton tab="calculator" href="/app/calculator">
+              <IonIcon icon={calculatorOutline} />
+              <IonLabel>Calculator</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="profile" href="/app/profile">
-              <IonIcon icon={person} />
-              <IonLabel>Profile</IonLabel>
+            <IonTabButton tab="chat" href="/app/chat">
+              <IonIcon icon={chatbubblesOutline} />
+              <IonLabel>Chat</IonLabel>
+              {unreadMessages > 0 && <IonBadge color="danger">{unreadMessages}</IonBadge>}
             </IonTabButton>
           </IonTabBar>
         )}

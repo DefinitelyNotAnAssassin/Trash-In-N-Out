@@ -83,7 +83,7 @@ export const MaterialRequestMap: React.FC<MaterialRequestMapProps> = ({ requests
       const newMap = await GoogleMap.create({
         id: "material-request-map",
         element: mapRef.current,
-        apiKey: "AIzaSyDmSzv-D1glzeKveS_OF0ZlXaWLuvLyhuk",
+        apiKey: "AIzaSyCjkzdlzmt71ouI5nGXPQluqY1E_2vkqME",
         config: {
           center: currentLocation,
           zoom: 14,

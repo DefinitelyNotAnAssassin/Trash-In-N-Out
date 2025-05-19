@@ -1,6 +1,6 @@
 {
-    "appId": "io.ionic.recyclemate",
-    "appName": "RecycleMate",
+    "appId": "io.ionic.Trash-In-N-Out",
+    "appName": "Trash-In-N-Out",
     "webDir": "dist",
     "bundledWebRuntime": false,
     "plugins": {
@@ -11,7 +11,7 @@
         "permissions": ["location"]
       },
       "GoogleMaps": {
-        "apiKey": "AIzaSyDmSzv-D1glzeKveS_OF0ZlXaWLuvLyhuk"
+        "apiKey": "AIzaSyCjkzdlzmt71ouI5nGXPQluqY1E_2vkqME"
       }
     },
     "server": {

@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { getFirestore, enableMultiTabIndexedDbPersistence } from "firebase/firestore"
 import { getStorage } from "firebase/storage"
+import { getAuth } from "firebase/auth" // Add this import for authentication
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -19,6 +20,7 @@ const app = initializeApp(firebaseConfig)
 // Initialize services
 export const firestore = getFirestore(app)
 export const storage = getStorage(app)
+export const auth = getAuth(app) // Initialize and export Firebase Authentication
 
 // Enable offline persistence with better error handling
 const enableOfflineSupport = async () => {

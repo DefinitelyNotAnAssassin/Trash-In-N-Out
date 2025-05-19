@@ -5,6 +5,9 @@ import { createContext, useState, useEffect, useContext } from "react"
 import { firestore } from "../firebase"
 import { collection, doc, setDoc, getDoc, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore"
 import { generateSecureToken, hashPassword, verifyPassword } from "../utils/auth"
+import { signOut } from 'firebase/auth';
+import { auth } from '../firebase';
+import { useHistory } from 'react-router-dom';
 
 type UserRole = "resident" | "junkshop"
 
@@ -39,6 +42,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
+  const history = useHistory();
 
   // Check for active session on load
   useEffect(() => {
@@ -70,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 ...userDoc.data(),
               } as UserData)
 
+              // Store user data in localStorage
               localStorage.setItem(
                 "userData",
                 JSON.stringify({
@@ -143,6 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         points: 0,
       })
 
+      // Store user data in localStorage for easy access
       localStorage.setItem(
         "userData",
         JSON.stringify({
@@ -225,36 +231,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      const sessionToken = localStorage.getItem("sessionToken")
-      const userId = localStorage.getItem("userId")
-
-      if (sessionToken && userId) {
-        // Invalidate session in Firestore
-        const sessionsRef = collection(firestore, "sessions")
-        const q = query(sessionsRef, where("userId", "==", userId), where("token", "==", sessionToken))
-
-        const querySnapshot = await getDocs(q)
-
-        if (!querySnapshot.empty) {
-          const sessionDoc = querySnapshot.docs[0]
-          await setDoc(doc(firestore, "sessions", sessionDoc.id), { isValid: false }, { merge: true })
-        }
-      }
-
-      // Clear local storage
-      localStorage.removeItem("sessionToken")
-      localStorage.removeItem("userId")
-
-      // Clear current user
-      setCurrentUser(null)
-
-      // Clear user data from localStorage
-      localStorage.removeItem("userData")
+      await signOut(auth);
+      // Clear user data from state
+      setCurrentUser(null);
+      
+      // Clear user data from local storage
+      localStorage.removeItem('userData');
+      
+      // Redirect to login page
+      history.push('/login');
     } catch (error) {
-      console.error("Logout error:", error)
-      throw error
+      console.error("Logout error:", error);
+      throw error;
     }
-  }
+  };
 
   const value = {
     currentUser,
@@ -269,9 +259,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 // Get user data from localStorage
 export const getUserDataFromStorage = (): UserData | null => {
-  const userData = localStorage.getItem("userData")
-  if (userData) {
-    return JSON.parse(userData)
+  try {
+    const userData = localStorage.getItem("userData")
+    if (userData) {
+      const parsedData = JSON.parse(userData)
+      console.log("User data from storage:", parsedData) // Debug log
+      return parsedData
+    }
+    return null
+  } catch (error) {
+    console.error("Error parsing user data from storage:", error)
+    return null
   }
-  return null
 }

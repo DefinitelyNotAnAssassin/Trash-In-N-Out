@@ -1,0 +1,184 @@
+/* Chat container styles */
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 12px;
+  background-color: #f5f5f5;
+}
+
+/* Empty chat state */
+.empty-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 16px;
+  text-align: center;
+}
+
+.empty-chat-icon {
+  font-size: 64px;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+.empty-chat-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.empty-chat-subtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Messages container */
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 8px;
+}
+
+/* Date separator */
+.date-separator {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+}
+
+.date-bubble {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+/* Message row */
+.message-row {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.message-row-sender {
+  justify-content: flex-end;
+}
+
+.message-row-receiver {
+  justify-content: flex-start;
+}
+
+/* Message bubble */
+.message-bubble {
+  max-width: 75%;
+  padding: 8px 12px;
+  border-radius: 16px;
+  position: relative;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+.message-bubble-sender {
+  background-color: var(--ion-color-primary);
+  color: white;
+  border-top-right-radius: 4px;
+}
+
+.message-bubble-receiver {
+  background-color: white;
+  color: #333;
+  border-top-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Message text */
+.message-text {
+  font-size: 14px;
+  margin: 0;
+  padding: 0;
+  line-height: 1.4;
+}
+
+/* Message metadata */
+.message-meta {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.message-meta-sender {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.message-meta-receiver {
+  color: #999;
+}
+
+.message-time {
+  margin-right: 4px;
+}
+
+.message-status {
+  font-size: 14px;
+  margin-left: 2px;
+}
+
+/* Footer and input area */
+.chat-footer {
+  border-top: 1px solid #eee;
+  background-color: white;
+}
+
+.message-input-container {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+}
+
+.message-input {
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --background: #f5f5f5;
+  --border-radius: 20px;
+  --placeholder-color: #999;
+  margin-right: 8px;
+  max-height: 120px;
+}
+
+.send-button {
+  --padding-start: 8px;
+  --padding-end: 8px;
+  --padding-top: 8px;
+  --padding-bottom: 8px;
+  margin: 0;
+  height: 40px;
+  width: 40px;
+}
+
+/* Fix for Android */
+.chat-content {
+  --background: #f5f5f5;
+}
+
+/* Ensure the content fills the available space */
+ion-content.chat-content {
+  --overflow: hidden;
+}
+
+/* Fix for iOS */
+@supports (-webkit-touch-callout: none) {
+  .message-bubble-sender {
+    background-color: var(--ion-color-primary);
+  }
+}
+    

@@ -7,7 +7,7 @@ import { locateOutline } from "ionicons/icons"
 import { Geolocation } from "@capacitor/geolocation"
 
 // Use the provided Google Maps API key
-const GOOGLE_MAPS_API_KEY = "AIzaSyDmSzv-D1glzeKveS_OF0ZlXaWLuvLyhuk"
+const GOOGLE_MAPS_API_KEY = "AIzaSyCjkzdlzmt71ouI5nGXPQluqY1E_2vkqME"
 
 interface IframeMapProps {
   onLocationSelect: (location: { lat: number; lng: number }) => void

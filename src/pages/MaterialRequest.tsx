@@ -1,7 +1,7 @@
-"\"use client"
+"use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useRef } from "react"
 import {
   IonContent,
   IonHeader,
@@ -31,8 +31,16 @@ const MaterialRequest: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState("")
 
+  // Refs for direct DOM access
+  const typeSelectRef = useRef<HTMLIonSelectElement>(null)
+  const descriptionTextareaRef = useRef<HTMLIonTextareaElement>(null)
+
   const handleSubmit = async () => {
-    if (!type || !description) {
+    // Get values directly from the DOM to avoid delay
+    const typeValue = (typeSelectRef.current?.value as string) || type
+    const descriptionValue = (descriptionTextareaRef.current?.value as string) || description
+
+    if (!typeValue || !descriptionValue) {
       setAlertMessage("Please fill in all fields.")
       setShowAlert(true)
       return
@@ -43,8 +51,8 @@ const MaterialRequest: React.FC = () => {
       await addDoc(collection(firestore, "materialRequests"), {
         userId: userData?.uid,
         userName: userData?.name,
-        type,
-        description,
+        type: typeValue,
+        description: descriptionValue,
         status: "pending",
         createdAt: serverTimestamp(),
       })
@@ -62,6 +70,17 @@ const MaterialRequest: React.FC = () => {
     }
   }
 
+  // Handle input changes directly without delay
+  const handleTypeChange = (e: CustomEvent) => {
+    const value = e.detail.value || ""
+    setType(value)
+  }
+
+  const handleDescriptionChange = (e: CustomEvent) => {
+    const value = e.detail.value || ""
+    setDescription(value)
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -72,7 +91,7 @@ const MaterialRequest: React.FC = () => {
       <IonContent className="ion-padding">
         <IonItem>
           <IonLabel position="floating">Material Type</IonLabel>
-          <IonSelect value={type} onIonChange={(e) => setType(e.detail.value!)}>
+          <IonSelect value={type} onIonChange={handleTypeChange} ref={typeSelectRef} interface="popover">
             <IonSelectOption value="paper">Paper</IonSelectOption>
             <IonSelectOption value="plastic">Plastic</IonSelectOption>
             <IonSelectOption value="metal">Metal</IonSelectOption>
@@ -83,7 +102,12 @@ const MaterialRequest: React.FC = () => {
         </IonItem>
         <IonItem>
           <IonLabel position="floating">Description</IonLabel>
-          <IonTextarea value={description} onIonChange={(e) => setDescription(e.detail.value!)} />
+          <IonTextarea
+            value={description}
+            onIonInput={handleDescriptionChange}
+            ref={descriptionTextareaRef}
+            debounce={0}
+          />
         </IonItem>
         <IonButton expand="full" onClick={handleSubmit} disabled={loading}>
           Submit Request
@@ -103,4 +127,3 @@ const MaterialRequest: React.FC = () => {
 }
 
 export default MaterialRequest
-

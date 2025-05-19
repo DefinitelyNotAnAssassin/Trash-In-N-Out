@@ -1,0 +1,143 @@
+.dashboard-container {
+  padding: 16px;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+.dashboard-card {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card .card-content {
+  text-align: center;
+}
+
+.dashboard-card h2 {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 10px 0 5px;
+  color: var(--ion-color-dark);
+}
+
+.dashboard-card p {
+  margin: 0;
+  color: var(--ion-color-medium);
+  font-size: 14px;
+}
+
+.card-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.card-icon ion-icon {
+  font-size: 32px;
+}
+
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.card-header-with-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.data-table th,
+.data-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.data-table th {
+  font-weight: bold;
+  color: var(--ion-color-medium);
+  background-color: #f5f5f5;
+}
+
+.data-table tr:hover {
+  background-color: var(--ion-color-light);
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  color: #888;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 12px;
+  border-radius: 8px;
+  background-color: var(--ion-color-light);
+  margin-bottom: 10px;
+}
+
+.stat-item h3 {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: var(--ion-color-dark);
+}
+
+.date-filter-popover {
+  --width: 300px;
+}
+
+/* PDF specific styles */
+@media print {
+  .dashboard-container {
+    background: white;
+    color: black;
+  }
+
+  .card-header-with-actions .card-actions {
+    display: none;
+  }
+
+  ion-searchbar,
+  ion-segment,
+  ion-toolbar {
+    display: none;
+  }
+
+  .chart-container {
+    page-break-inside: avoid;
+    margin-bottom: 30px;
+  }
+
+  .data-table {
+    page-break-inside: avoid;
+  }
+}

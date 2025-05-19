@@ -52,6 +52,13 @@ interface MaterialRequest {
   }
 }
 
+interface MaterialPrice {
+  id: string
+  name: string
+  price: number
+  unit: string
+}
+
 const UserMaterialRequests: React.FC = () => {
   const { userData } = useAuth()
   const storedUserData = getUserDataFromStorage()
@@ -65,6 +72,9 @@ const UserMaterialRequests: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false)
   const [requestToDelete, setRequestToDelete] = useState<string | null>(null)
 
+  // New state for material prices
+  const [materialPrices, setMaterialPrices] = useState<MaterialPrice[]>([])
+
   // New state for the create request modal
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [materialType, setMaterialType] = useState("")
@@ -72,11 +82,36 @@ const UserMaterialRequests: React.FC = () => {
   const [quantity, setQuantity] = useState("")
   const [selectedLocation, setSelectedLocation] = useState<{ lat: number; lng: number } | null>(null)
 
+  // Fetch material prices
+  const fetchMaterialPrices = useCallback(async () => {
+    try {
+      const pricesRef = collection(firestore, "materialPrices");
+      const q = query(pricesRef, orderBy("name"));
+      const querySnapshot = await getDocs(q);
+      
+      const prices: MaterialPrice[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        prices.push({
+          id: doc.id,
+          name: data.name,
+          price: data.price,
+          unit: data.unit
+        });
+      });
+      
+      setMaterialPrices(prices);
+    } catch (error) {
+      console.error("Error fetching material prices:", error);
+    }
+  }, []);
+
   useEffect(() => {
     if (userInfo?.uid) {
       fetchMaterialRequests()
+      fetchMaterialPrices()
     }
-  }, [userInfo?.uid, statusFilter]) // Only depend on userInfo.uid and statusFilter
+  }, [userInfo?.uid, statusFilter, fetchMaterialPrices]) // Added fetchMaterialPrices to the dependency array
 
   const fetchMaterialRequests = useCallback(async () => {
     if (!userInfo?.uid) return
@@ -306,12 +341,22 @@ const UserMaterialRequests: React.FC = () => {
               <IonItem className="mb-4">
                 <IonLabel position="stacked">Material Type*</IonLabel>
                 <IonSelect value={materialType} onIonChange={(e) => setMaterialType(e.detail.value)}>
-                  <IonSelectOption value="paper">Paper</IonSelectOption>
-                  <IonSelectOption value="plastic">Plastic</IonSelectOption>
-                  <IonSelectOption value="metal">Metal</IonSelectOption>
-                  <IonSelectOption value="glass">Glass</IonSelectOption>
-                  <IonSelectOption value="electronics">Electronics</IonSelectOption>
-                  <IonSelectOption value="other">Other</IonSelectOption>
+                  {materialPrices.length > 0 ? (
+                    materialPrices.map((material) => (
+                      <IonSelectOption key={material.id} value={material.name}>
+                        {material.name} per {material.unit}
+                      </IonSelectOption>
+                    ))
+                  ) : (
+                    <>
+                      <IonSelectOption value="paper">Paper</IonSelectOption>
+                      <IonSelectOption value="plastic">Plastic</IonSelectOption>
+                      <IonSelectOption value="metal">Metal</IonSelectOption>
+                      <IonSelectOption value="glass">Glass</IonSelectOption>
+                      <IonSelectOption value="electronics">Electronics</IonSelectOption>
+                      <IonSelectOption value="other">Other</IonSelectOption>
+                    </>
+                  )}
                 </IonSelect>
               </IonItem>
 
@@ -380,8 +425,16 @@ const UserMaterialRequests: React.FC = () => {
           onDidDismiss={() => setShowAlert(false)}
           header="Confirm Delete"
           message="Are you sure you want to delete this request?"
-     
-          
+          buttons={[
+            {
+              text: 'Cancel',
+              role: 'cancel',
+            },
+            {
+              text: 'Delete',
+              handler: () => handleDeleteRequest(),
+            },
+          ]}
         />
       </IonContent>
     </IonPage>

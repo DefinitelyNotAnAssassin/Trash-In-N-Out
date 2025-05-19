@@ -30,6 +30,8 @@ import {
   mapOutline,
   trophy,
   notifications,
+  calculatorOutline,
+  statsChartOutline,
 } from "ionicons/icons"
 import { useHistory } from "react-router"
 import { collection, query, where, getDocs, orderBy, limit } from "firebase/firestore"
@@ -46,6 +48,8 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   const isResident = userInfo?.role === "resident"
+  const isAdmin = userInfo?.role === "admin"
+  const isJunkshop = userInfo?.role === "junkshop"
 
   useEffect(() => {
     if (!userInfo?.uid) return
@@ -146,14 +150,18 @@ const Home: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>RecycleMate</IonTitle>
+          <IonTitle>Trash-In-N-Out</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <div className="mb-6">
           <h1 className="text-2xl font-bold">Welcome, {userInfo?.name}!</h1>
           <p className="text-gray-600">
-            {isResident ? "Help reduce waste by recycling your materials" : "Find recyclable materials in your area"}
+            {isAdmin 
+              ? "Monitor and manage the system" 
+              : isResident 
+              ? "Help reduce waste by recycling your materials" 
+              : "Find recyclable materials in your area"}
           </p>
         </div>
 
@@ -168,7 +176,9 @@ const Home: React.FC = () => {
             </IonCardTitle>
           </IonCardHeader>
           <IonCardContent>
-            {isResident
+            {isAdmin 
+              ? "Track system impact and user participation"
+              : isResident
               ? "Earn points by recycling materials and redeem them for rewards!"
               : "Earn points by collecting recyclable materials!"}
             <IonButton fill="clear" color="success" onClick={() => history.push("/app/rewards")}>
@@ -178,31 +188,54 @@ const Home: React.FC = () => {
         </IonCard>
 
         <IonGrid>
+          {/* Navigation options based on role */}
           <IonRow>
-            {isResident ? (
+            {isAdmin ? (
               <>
                 <IonCol size="6">
-                  <IonCard className="h-full" onClick={() => history.push("/app/map")}>
-                    <IonCardHeader>
-                      <IonCardTitle className="text-lg">Report Materials</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent className="flex flex-col items-center">
-                      <IonIcon icon={addCircleOutline} size="large" color="success" />
+                  <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/admin-dashboard")}>
+                    <IonCardContent className="flex flex-col justify-center items-center">
+                      <IonIcon icon={statsChartOutline} size="large" color="success" />
                       <IonButton fill="clear" color="success" className="mt-2">
-                        Add New
+                        Dashboard
                       </IonButton>
                     </IonCardContent>
                   </IonCard>
                 </IonCol>
                 <IonCol size="6">
-                  <IonCard className="h-full" onClick={() => history.push("/app/my-requests")}>
-                    <IonCardHeader>
-                      <IonCardTitle className="text-lg">My Recyclables</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent className="flex flex-col items-center">
+                  <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/notifications")}>
+                    <IonCardContent className="flex flex-col justify-center items-center">
+                      <IonIcon icon={notifications} size="large" color="success" />
+                      {unreadNotifications > 0 && (
+                        <IonBadge color="danger" className="mt-1">
+                          {unreadNotifications}
+                        </IonBadge>
+                      )}
+                      <IonButton fill="clear" color="success" className="mt-2">
+                        Alerts
+                      </IonButton>
+                    </IonCardContent>
+                  </IonCard>
+                </IonCol>
+              </>
+            ) : isResident ? (
+              <>
+                <IonCol size="6">
+                  <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/map")}>
+                    <IonCardContent className="flex flex-col justify-center items-center">
+                      <IonIcon icon={addCircleOutline} size="large" color="success" />
+                      <IonButton fill="clear" color="success" className="mt-2">
+                        Report Materials
+                      </IonButton>
+                    </IonCardContent>
+                  </IonCard>
+                </IonCol>
+                <IonCol size="6">
+                  <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/my-requests")}>
+                    <IonCardContent className="flex flex-col justify-center items-center">
                       <IonIcon icon={listOutline} size="large" color="success" />
                       <IonButton fill="clear" color="success" className="mt-2">
-                        View List
+                        My Recyclables
                       </IonButton>
                     </IonCardContent>
                   </IonCard>
@@ -211,27 +244,21 @@ const Home: React.FC = () => {
             ) : (
               <>
                 <IonCol size="6">
-                  <IonCard className="h-full" onClick={() => history.push("/app/junkshop-dashboard")}>
-                    <IonCardHeader>
-                      <IonCardTitle className="text-lg">Dashboard</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent className="flex flex-col items-center">
+                  <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/junkshop-dashboard")}>
+                    <IonCardContent className="flex flex-col justify-center items-center">
                       <IonIcon icon={businessOutline} size="large" color="success" />
                       <IonButton fill="clear" color="success" className="mt-2">
-                        Open
+                        Dashboard
                       </IonButton>
                     </IonCardContent>
                   </IonCard>
                 </IonCol>
                 <IonCol size="6">
-                  <IonCard className="h-full" onClick={() => history.push("/app/find-materials")}>
-                    <IonCardHeader>
-                      <IonCardTitle className="text-lg">Find Materials</IonCardTitle>
-                    </IonCardHeader>
-                    <IonCardContent className="flex flex-col items-center">
+                  <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/find-materials")}>
+                    <IonCardContent className="flex flex-col justify-center items-center">
                       <IonIcon icon={mapOutline} size="large" color="success" />
                       <IonButton fill="clear" color="success" className="mt-2">
-                        View Map
+                        Find Materials
                       </IonButton>
                     </IonCardContent>
                   </IonCard>
@@ -239,41 +266,60 @@ const Home: React.FC = () => {
               </>
             )}
           </IonRow>
-          <IonRow>
-            <IonCol size="6">
-              <IonCard className="h-full" onClick={() => history.push("/app/notifications")}>
-                <IonCardHeader>
-                  <IonCardTitle className="text-lg flex items-center">
-                    Alerts
-                    {unreadNotifications > 0 && (
-                      <IonBadge color="danger" className="ml-2">
-                        {unreadNotifications}
-                      </IonBadge>
-                    )}
-                  </IonCardTitle>
-                </IonCardHeader>
-                <IonCardContent className="flex flex-col items-center">
-                  <IonIcon icon={notifications} size="large" color="success" />
-                  <IonButton fill="clear" color="success" className="mt-2">
-                    View Alerts
-                  </IonButton>
-                </IonCardContent>
-              </IonCard>
-            </IonCol>
-            <IonCol size="6">
-              <IonCard className="h-full" onClick={() => history.push("/app/rewards")}>
-                <IonCardHeader>
-                  <IonCardTitle className="text-lg">Rewards</IonCardTitle>
-                </IonCardHeader>
-                <IonCardContent className="flex flex-col items-center">
-                  <IonIcon icon={trophy} size="large" color="success" />
-                  <IonButton fill="clear" color="success" className="mt-2">
-                    View Rewards
-                  </IonButton>
-                </IonCardContent>
-              </IonCard>
-            </IonCol>
-          </IonRow>
+          
+          {/* Second row of cards - only for non-admin users */}
+          {!isAdmin && (
+            <IonRow>
+              <IonCol size="6">
+                <IonCard className="h-full flex  justify-center items-center" onClick={() => history.push("/app/notifications")}>
+                  <IonCardContent className="flex flex-col  justify-center items-center">
+                    
+
+                    <div>
+
+                        <IonIcon icon={notifications} size="large" color="success" />
+                          {unreadNotifications > 0 && (
+                            <IonBadge color="danger" className="mt-1">
+                              {unreadNotifications}
+                            </IonBadge>
+                          )}  
+                    </div>
+                   
+                    <IonButton fill="clear" color="success" className="mt-2">
+
+                      Alerts
+                    </IonButton>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+              <IonCol size="6">
+                <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/rewards")}>
+                  <IonCardContent className="flex flex-col justify-center items-center">
+                    <IonIcon icon={trophy} size="large" color="success" />
+                    <IonButton fill="clear" color="success" className="mt-2">
+                      Rewards
+                    </IonButton>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          )}
+          
+          {/* Calculator card - only for non-admin users */}
+          {!isAdmin && (
+            <IonRow>
+              <IonCol size="6">
+                <IonCard className="h-full flex flex-col justify-center items-center" onClick={() => history.push("/app/calculator")}>
+                  <IonCardContent className="flex flex-col justify-center items-center">
+                    <IonIcon icon={calculatorOutline} size="large" color="success" />
+                    <IonButton fill="clear" color="success" className="mt-2">
+                      Junk Calculator
+                    </IonButton>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          )}
         </IonGrid>
 
         <IonCard className="mt-4">
