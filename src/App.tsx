@@ -244,11 +244,14 @@ const AppTabs: React.FC = () => {
               <IonIcon icon={listOutline} />
               <IonLabel>My Requests</IonLabel>
             </IonTabButton>
-       
             <IonTabButton tab="chat" href="/app/chat">
               <IonIcon icon={chatbubblesOutline} />
               <IonLabel>Chat</IonLabel>
               {unreadMessages > 0 && <IonBadge color="danger">{unreadMessages}</IonBadge>}
+            </IonTabButton>
+            <IonTabButton tab="profile" href="/app/profile">
+              <IonIcon icon={person} />
+              <IonLabel>Profile</IonLabel>
             </IonTabButton>
           </IonTabBar>
         ) : (
@@ -273,6 +276,10 @@ const AppTabs: React.FC = () => {
               <IonIcon icon={chatbubblesOutline} />
               <IonLabel>Chat</IonLabel>
               {unreadMessages > 0 && <IonBadge color="danger">{unreadMessages}</IonBadge>}
+            </IonTabButton>
+            <IonTabButton tab="profile" href="/app/profile">
+              <IonIcon icon={person} />
+              <IonLabel>Profile</IonLabel>
             </IonTabButton>
           </IonTabBar>
         )}
